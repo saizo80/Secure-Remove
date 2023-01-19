@@ -11,7 +11,7 @@
         int passes = 5000;
         if (args.Length == 2) {
             passes = int.Parse(args[1]);
-        } 
+        } // change this ^
 
         if (path == "*") {
             // get all files in the working directory
@@ -21,9 +21,32 @@
                 // delete the file
                 deleteFile(file, passes);
             }
+        } else if (Directory.Exists(path) && !args.Contains("-r")) {
+            // if path is a directory and '-r' not in args, send a warning to the user
+            System.Console.WriteLine(path + " is a directory.");
+            //System.Console.WriteLine("If so, use the '-r' option.");
+        } else if (Directory.Exists(path) && args.Contains("-r")) {
+            // if path is a directory and '-r' is in args, delete the directory
+            //deleteFolder(path, passes);
         } else {
             // delete the file
             deleteFile(path, passes);
+        }
+}
+    static void deleteFolder(string path, int passes) {
+        // get all files in the directory
+        string[] files = Directory.GetFiles(path);
+        // loop through the files
+        // if the file is a directory, call deleteFolder() recursively
+        // else, call deleteFile()
+        foreach (string file in files) {
+            if (Directory.Exists(file)) {
+                deleteFolder(file, passes);
+                // delete the directory
+                Directory.Delete(file);
+            } else {
+                deleteFile(file, passes);
+            }
         }
     }
 
