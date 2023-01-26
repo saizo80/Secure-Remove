@@ -14,7 +14,8 @@
         int passes = 10;
         bool recursive = false;
         bool verbose = false;
-        bool debug = false;
+
+        bool debug = true;
 
         int counter = 0;
         // loop through args
@@ -36,7 +37,6 @@
             {
                 // set passes to the next arg
                 passes = int.Parse(args[counter + 1]);
-                if (debug) { System.Console.WriteLine("Passes: " + passes); }
             }
             if (arg == "-v")
             {
@@ -45,7 +45,16 @@
             counter++;
         }
 
-        if (debug) { System.Console.WriteLine("Path: " + path); }
+        // if debug, print the args
+        if (debug)
+        {
+            System.Console.WriteLine("\nPath: " + path);
+            System.Console.WriteLine("Passes: " + passes);
+            System.Console.WriteLine("Recursive: " + recursive);
+            System.Console.WriteLine("Verbose: " + verbose);
+        }
+
+
         if (path == "")
         {
             // print the usage
@@ -53,9 +62,8 @@
             return;
         }
 
-        if (path == "*")
+        if (path == "*" || path == "./*" || path == ".\\*")
         {
-            if (debug) { System.Console.WriteLine("Path is *"); }
             // get all files in the working directory
             string[] folders = Directory.GetDirectories(Directory.GetCurrentDirectory());
             string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
@@ -110,6 +118,8 @@
     }
     static void deleteFolder(string path, int passes, bool verbose, bool debug)
     {
+        // if path ends with . or .., skip it
+        if (path.EndsWith(".") || path.EndsWith("..")) { return; }
         if (debug) { System.Console.WriteLine("Deleting folder: " + path); }
 
         // get all files and folder in the directory
