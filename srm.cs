@@ -1,4 +1,31 @@
-﻿class srm
+﻿static class Globals
+{
+    static string VERSION = "0.2.1";
+    static string LICENSE = "GPLV3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.";
+    static string AUTHOR = "Olivier Thornton";
+
+    public static void help()
+    {
+        System.Console.WriteLine("Usage: srm [OPTION]... [FILE]...");
+        System.Console.WriteLine("Securely remove files or directories.\n");
+        System.Console.WriteLine("  -r, --recursive\tremove directories and their contents recursively");
+        System.Console.WriteLine("  -p, --passes\t\tset the number of passes (default is 10)");
+        System.Console.WriteLine("  -v, --verbose\t\texplain what is being done");
+        System.Console.WriteLine("      --version\t\toutput version information and exit");
+    }
+
+    public static void version()
+    {
+        System.Console.WriteLine(@$"srm {VERSION}
+License {LICENSE}
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+        
+Written by {AUTHOR}.");
+    }
+}
+
+class srm
 {
     static void Main(string[] args)
     {
@@ -24,23 +51,36 @@
             if (debug) { System.Console.WriteLine(counter + ": " + arg); }
 
             // if first arg set to path
-            if (counter == 0 && arg != "-r" && arg != "-p" && arg != "-v")
+            if (counter == args.Length - 1 && arg != "-r" && arg != "-p" && arg != "-v" && arg != "--help")
             {
                 // set path to arg for use outside of the loop
                 path = arg;
             }
-            if (arg == "-r")
+            if (arg == "-r" || arg == "--recursive")
             {
                 recursive = true;
             }
-            if (arg == "-p")
+            {
+                recursive = true;
+            }
+            if (arg == "-p" || arg == "--passes")
             {
                 // set passes to the next arg
                 passes = int.Parse(args[counter + 1]);
             }
-            if (arg == "-v")
+            if (arg == "-v" || arg == "--verbose")
             {
                 verbose = true;
+            }
+            if (arg == "--help")
+            {
+                Globals.help();
+                return;
+            }
+            if (arg == "--version")
+            {
+                Globals.version();
+                return;
             }
             counter++;
         }
@@ -58,7 +98,12 @@
         if (path == "")
         {
             // print the usage
-            System.Console.WriteLine("Usage: srm <file> [passes: optional]");
+            System.Console.WriteLine("srm: missing operand\nTry 'srm --help' for more information.");
+            return;
+        }
+        if (path == "/" || path.ToLower() == "c" || path.ToLower() == "c:")
+        {
+            System.Console.WriteLine("Cannot delete root directory");
             return;
         }
 
@@ -96,8 +141,7 @@
         else if (Directory.Exists(path) && !recursive)
         {
             // if path is a directory and '-r' not in args, send a warning to the user
-            System.Console.WriteLine(path + " is a directory.");
-            System.Console.WriteLine("To delete use the '-r' option.");
+            System.Console.WriteLine($"srm: cannot remove '{path}': Is a directory");
         }
         else if (Directory.Exists(path) && recursive)
         {
@@ -105,14 +149,14 @@
             // if path is a directory and '-r' is in args, delete the directory
             deleteFolder(path, passes, verbose, debug);
             // delete folder at path
-            if (verbose) { System.Console.Write("Deleting directory " + path + ". . . "); }
+            if (verbose) { System.Console.Write($"Deleting directory '{path}' . . .\t\t"); }
             Directory.Delete(path);
             if (verbose) { System.Console.WriteLine("Done"); }
         }
-        else if (File.Exists(path))
+        else
         {
-            // delete the file
-            deleteFile(path, passes, verbose, debug);
+            if (File.Exists(path)) { deleteFile(path, passes, verbose, debug); }
+            else { System.Console.WriteLine($"rm: cannot remove '{path}': No such file or directory"); }
         }
         if (debug) { System.Console.WriteLine("Done"); }
     }
@@ -139,9 +183,9 @@
             {
                 if (debug) { System.Console.WriteLine("Deleting directory: " + file); }
                 deleteFolder(file, passes, verbose, debug);
-                System.Console.Write("Deleting directory " + file + ". . . ");
+                if (verbose) { System.Console.Write($"Deleting directory '{path}' . . .\t\t"); }
                 Directory.Delete(file);
-                System.Console.WriteLine("Done");
+                if (verbose) { System.Console.WriteLine("Done"); }
 
             }
             else if (File.Exists(file))
@@ -160,7 +204,7 @@
         using (var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
         {
             // print the file name
-            if (verbose) { System.Console.Write("Deleting " + path + ". . . "); }
+            if (verbose) { System.Console.Write($"Deleting '{path}' . . .\t\t"); }
             for (int i = 0; i < passes; i++)
             {
                 // get the length of the file
