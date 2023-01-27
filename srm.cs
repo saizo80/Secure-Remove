@@ -1,6 +1,6 @@
 ﻿static class Globals
 {
-    static string VERSION = "0.2.1";
+    static string VERSION = "1.0.0";
     static string LICENSE = "GPLV3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.";
     static string AUTHOR = "Olivier Thornton";
     public static bool DEBUG = false;
