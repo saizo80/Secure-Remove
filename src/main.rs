@@ -1,10 +1,4 @@
-use rand::{RngCore, SeedableRng};
-use rand_chacha::ChaChaRng;
-use std::{
-    fs,
-    io::{Seek, SeekFrom, Write},
-    path,
-};
+use std::{fs, path};
 
 const DEBUG: bool = false;
 const VERSION: &str = "2.0.0";
@@ -26,7 +20,7 @@ fn main() {
 
     let mut path = String::new();
     let mut recursive = false;
-    let mut passes = 10;
+    let mut passes = 40;
     let mut verbose = false;
 
     let mut counter = 0;
@@ -63,8 +57,7 @@ fn main() {
         }
 
         if arg == "-p" || arg == "--passes" {
-            passes = args[counter + 1].parse::<u16>().unwrap();
-            counter += 1;
+            passes = args[counter + 1].parse::<u32>().unwrap();
         }
 
         if arg == "--version" {
@@ -151,7 +144,7 @@ fn main() {
                 }
             } else if object.file_type().unwrap().is_file() {
                 // if object is a file, delete it
-                delete_file(
+                shred_file(
                     &object.file_name().to_string_lossy().to_string(),
                     passes,
                     verbose,
@@ -179,7 +172,7 @@ fn main() {
         }
     } else {
         if path::Path::new(&path).is_file() {
-            delete_file(&path, passes, verbose)
+            shred_file(&path, passes, verbose)
         } else {
             println!("srm: cannot remove '{}': No such file or directory", path);
         }
@@ -190,7 +183,7 @@ fn main() {
     }
 }
 
-fn delete_folder(path: &String, passes: u16, verbose: bool) {
+fn delete_folder(path: &String, passes: u32, verbose: bool) {
     // if path ends with . or .., skip it
     if path.ends_with(".") || path.ends_with("..") {
         return;
@@ -231,50 +224,33 @@ fn delete_folder(path: &String, passes: u16, verbose: bool) {
             // create the full path to the file
             let new_path = path.to_string() + "/" + &object.file_name().to_string_lossy();
 
-            delete_file(&new_path, passes, verbose);
+            shred_file(&new_path, passes, verbose);
         }
     }
 }
 
-fn delete_file(path: &String, passes: u16, verbose: bool) {
+fn shred_file(path: &String, passes: u32, verbose: bool) {
     if DEBUG {
         println!("- DEBUG - Deleting file: '{}'", path);
     }
 
-    // open the file for reading and writing
-    let mut file = fs::OpenOptions::new()
-        .read(true)
-        .write(true)
-        .open(path)
-        .unwrap();
+    let mut files = Vec::new();
+    files.push(path.to_string());
 
     if verbose {
         print!("Deleting file '{}' . . .\t\t", path);
     }
 
-    // get the file size
-    let file_size = file.metadata().unwrap().len();
-
-    // create a buffer to hold the random data
-    let mut buffer = vec![0; file_size as usize];
-
-    // create a random generator
-    let mut rng = ChaChaRng::from_entropy();
-
-    // loop through the file passes times
-    for _ in 0..passes {
-        // fill the buffer with random secure data using chacha
-        rng.fill_bytes(&mut buffer);
-        // write the buffer to the file
-        file.write_all(&buffer).unwrap();
-        // flush the file
-        file.flush().unwrap();
-        // seek to the beginning of the file
-        file.seek(SeekFrom::Start(0)).unwrap();
-    }
-
-    // delete the file
-    fs::remove_file(path).unwrap();
+    let config = file_shred::ShredConfig {
+        files: files,
+        confirmation_prompt: false,
+        verbosity: file_shred::Verbosity::Quiet,
+        keep_files: false,
+        overwrite_count: passes,
+        rename_count: passes,
+        progress_bar: false,
+    };
+    file_shred::shred(&config).unwrap();
 
     if verbose {
         println!("Done");

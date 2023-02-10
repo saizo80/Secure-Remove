@@ -11,5 +11,4 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8.5"
-rand_chacha = "0.3.1"
+file_shred = "1.1.0"

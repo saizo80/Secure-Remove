@@ -15,7 +15,11 @@ You will have the file named `srm` (`srm.exe` on Windows) I recommend
 putting the file in your path so you can do a simple command line call `srm`.
 
 If you have Cargo installed on your system, however, the easiest way of installing
-would be to run `cargo install --git https://github.com/saizo80/Secure-Remove`.
+would be to run:
+
+```bash
+cargo install --git https://github.com/saizo80/Secure-Remove
+```
 
 This will download, build, and automatically add the executable to your path.
 
@@ -39,3 +43,7 @@ The functions are very similar to what you can do with regular `rm`, except (for
 So `srm ./*` would be okay, whereas `srm ./*.txt` would **not** be okay.
 
 Other functions you can see by running `srm --help`.
+
+## Credit
+
+This project uses [software](https://github.com/mverleg/file_shred) written by GitHub user [mverleg](https://github.com/mverleg).
