@@ -1,7 +1,7 @@
 use std::{fs, path};
 
 const DEBUG: bool = false;
-const VERSION: &str = "2.0.0";
+const VERSION: &str = "2.1.0";
 const AUTHOR: &str = "Olivier Thornton";
 const LICENSE: &str = "GPLV3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.";
 
