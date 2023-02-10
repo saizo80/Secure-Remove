@@ -63,7 +63,8 @@ fn main() {
         }
 
         if arg == "-p" || arg == "--passes" {
-            passes = args[counter + 1].parse::<u8>().unwrap();
+            passes = args[counter + 1].parse::<u16>().unwrap();
+            counter += 1;
         }
 
         if arg == "--version" {
@@ -189,7 +190,7 @@ fn main() {
     }
 }
 
-fn delete_folder(path: &String, passes: u8, verbose: bool) {
+fn delete_folder(path: &String, passes: u16, verbose: bool) {
     // if path ends with . or .., skip it
     if path.ends_with(".") || path.ends_with("..") {
         return;
@@ -235,7 +236,7 @@ fn delete_folder(path: &String, passes: u8, verbose: bool) {
     }
 }
 
-fn delete_file(path: &String, passes: u8, verbose: bool) {
+fn delete_file(path: &String, passes: u16, verbose: bool) {
     if DEBUG {
         println!("- DEBUG - Deleting file: '{}'", path);
     }
