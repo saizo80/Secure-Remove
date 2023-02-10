@@ -1,32 +1,34 @@
 # Secure Remove CLI
 
-A terminal program for securely removing files with sensitive data, written in C#.
+A terminal program for securely removing files with sensitive data, written in Rust.
 
 While using the Eraser software for windows, I needed to be able to securely erase sensitive files
 from the terminal, and thus be able to call it in scripts. So I decided to write
-my own application to serve that purpose.
+my own application to serve that purpose. I originally wrote the script in C#, but decided to move
+to Rust for the speed benefits.
 
 ## Installation
 
-Simply select your architecture from the latest release and unzip the archive. Please note executables in the release tab
-are built to be self-contained. This means that they do not need to have .NET installed on the machine. However this increases
-the file size from ~100-200KB to ~14-20MB. This is an unavoidable consequence of having it self-contained. If lower sizes
-are needed I recommend building from source rather than downloading a pre-built binary.
+Simply select your architecture from the latest release and unzip the archive.
 
-You will have two files, `srm` (`srm.exe` on windows) and `srm.pdb`. I recommend
-putting these files in your path so you can do a simple command line call `srm`.
+You will have the file named `srm` (`srm.exe` on Windows) I recommend
+putting the file in your path so you can do a simple command line call `srm`.
+
+If you have Cargo installed on your system, however, the easiest way of installing
+would be to run `cargo install --git https://github.com/saizo80/Secure-Remove`.
+
+This will download, build, and automatically add the executable to your path.
 
 ## Building from Source
 
-If you really want to build from source, there's nothing stopping you.
+You can download the source code and build from scratch if you would like. You will
+need cargo installed on your system.
 
-Firstly make sure that you have at least .NET 7.0 from Microsoft installed.
-Which you can get from here: <https://dotnet.microsoft.com/en-us/download>
-
-Just download the source code and use `dotnet publish -o Release` and it will build for your architecture.
-
-Do **not** use the build scripts. They are for me and they will build and package for **all** architectures supported in the release, and the
-binaries that are built will be the self-contained version.
+```bash
+git clone https://github.com/saizo80/Secure-Remove.git
+cd Secure-Remove
+cargo build -r
+```
 
 ## Usage
 
