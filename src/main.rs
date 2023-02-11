@@ -13,7 +13,7 @@ fn main() {
     let args = &args[1..];
 
     // check if there are any arguments
-    if args.len() == 0 {
+    if args.is_empty() {
         println!("srm: missing operand\nTry 'srm --help' for more information.");
         std::process::exit(0);
     }
@@ -23,14 +23,12 @@ fn main() {
     let mut passes = 40;
     let mut verbose = false;
 
-    let mut counter = 0;
-
     if DEBUG {
         println!("--DEBUG--")
     }
 
     // loop through arguments
-    for arg in args {
+    for (counter, arg) in args.iter().enumerate() {
         if DEBUG {
             println!("{}: {}", counter, arg);
         }
@@ -70,7 +68,7 @@ fn main() {
             std::process::exit(0);
         }
 
-        if arg.contains("-")
+        if arg.contains('-')
             && arg != "-r"
             && arg != "-v"
             && arg != "-p"
@@ -79,8 +77,8 @@ fn main() {
             && arg != "--verbose"
             && arg != "--recursive"
             && arg != "--passes"
-            && !arg.contains("/")
-            && !arg.contains("\\")
+            && !arg.contains('/')
+            && !arg.contains('\\')
         {
             if DEBUG {
                 println!(
@@ -99,8 +97,6 @@ fn main() {
                 std::process::exit(0);
             }
         }
-
-        counter += 1;
     }
 
     if DEBUG {
@@ -110,17 +106,17 @@ fn main() {
         println!("Verbose: {}\n--DEBUG--", verbose);
     }
 
-    if path == "" {
+    if path.is_empty() {
         println!("srm: missing operand\nTry 'srm --help' for more information.");
         std::process::exit(0);
     } else if path == "/" || path.to_lowercase() == "c" || path.to_lowercase() == "c:" {
         println!("Cannot delete root directory.");
     } else if path == "*" || path == "./*" || path == ".\\*" {
         // get all files and folders in the working directory
-        let mut entries = fs::read_dir(".").unwrap();
+        let entries = fs::read_dir(".").unwrap();
 
         // loop through the files
-        while let Some(entry) = entries.next() {
+        for entry in entries {
             let object = entry.unwrap();
             if DEBUG {
                 println!("- DEBUG - File: {}", &object.file_name().to_string_lossy());
@@ -170,13 +166,11 @@ fn main() {
             // if path is a directory and recursive is false, skip the folder
             println!("srm: cannot remove '{}': Is a directory", path);
         }
-    } else {
-        if path::Path::new(&path).is_file() {
+    } else if path::Path::new(&path).is_file() {
             shred_file(&path, passes, verbose)
         } else {
             println!("srm: cannot remove '{}': No such file or directory", path);
         }
-    }
 
     if DEBUG {
         println!("- DEBUG - Done.");
@@ -185,7 +179,7 @@ fn main() {
 
 fn delete_folder(path: &String, passes: u32, verbose: bool) {
     // if path ends with . or .., skip it
-    if path.ends_with(".") || path.ends_with("..") {
+    if path.ends_with('.') || path.ends_with("..") {
         return;
     }
 
@@ -194,10 +188,10 @@ fn delete_folder(path: &String, passes: u32, verbose: bool) {
     }
 
     // get all files and folders in the directory
-    let mut entries = fs::read_dir(path).unwrap();
+    let entries = fs::read_dir(path).unwrap();
 
     // loop through the files
-    while let Some(entry) = entries.next() {
+    for entry in entries {
         let object = entry.unwrap();
 
         if DEBUG {
@@ -234,15 +228,14 @@ fn shred_file(path: &String, passes: u32, verbose: bool) {
         println!("- DEBUG - Deleting file: '{}'", path);
     }
 
-    let mut files = Vec::new();
-    files.push(path.to_string());
+    let files = vec![path.to_string()];
 
     if verbose {
         print!("Deleting file '{}' . . .\t\t", path);
     }
 
     let config = file_shred::ShredConfig {
-        files: files,
+        files,
         confirmation_prompt: false,
         verbosity: file_shred::Verbosity::Quiet,
         keep_files: false,
