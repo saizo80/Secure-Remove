@@ -1,9 +1,6 @@
-use std::{fs, path};
+use std::{fs, path::Path};
 
-const DEBUG: bool = false;
-const VERSION: &str = "2.1.0";
-const AUTHOR: &str = "Olivier Thornton";
-const LICENSE: &str = "GPLV3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.";
+mod constants;
 
 fn main() {
     // get passed arguments
@@ -23,73 +20,50 @@ fn main() {
     let mut passes = 40;
     let mut verbose = false;
 
-    if DEBUG {
+    if constants::DEBUG {
         println!("--DEBUG--")
     }
 
     // loop through arguments
     for (counter, arg) in args.iter().enumerate() {
-        if DEBUG {
+        if constants::DEBUG {
             println!("{}: {}", counter, arg);
         }
 
-        if counter == args.len() - 1
-            && arg != "-r"
-            && arg != "-v"
-            && arg != "-p"
-            && arg != "--help"
-            && arg != "--version"
-            && arg != "--verbose"
-            && arg != "--recursive"
-            && arg != "--passes"
-        {
+        match arg.as_str() {
+            "-r" | "--recursive" => recursive = true,
+            "-v" | "--verbose" => verbose = true,
+            "-p" | "--passes" => passes = args[counter + 1].parse::<u32>().unwrap(),
+            "--version" => {
+                version();
+                std::process::exit(0);
+            }
+            "--help" => {
+                help();
+                std::process::exit(0);
+            }
+            _ => {}
+        }
+
+        if counter == args.len() - 1 && !constants::CHECK_ARGS.contains(&arg.as_str()) {
             path = arg.to_string();
         }
 
-        if arg == "-r" || arg == "--recursive" {
-            recursive = true;
-        }
-
-        if arg == "-v" || arg == "--verbose" {
-            verbose = true;
-        }
-
-        if arg == "-p" || arg == "--passes" {
-            passes = args[counter + 1].parse::<u32>().unwrap();
-        }
-
-        if arg == "--version" {
-            version();
-            std::process::exit(0);
-        }
-
-        if arg == "--help" {
-            help();
-            std::process::exit(0);
-        }
-
-        if arg.contains('-')
-            && arg != "-r"
-            && arg != "-v"
-            && arg != "-p"
-            && arg != "--help"
-            && arg != "--version"
-            && arg != "--verbose"
-            && arg != "--recursive"
-            && arg != "--passes"
-            && !arg.contains('/')
-            && !arg.contains('\\')
+        if arg.contains("-")
+            && !constants::CHECK_ARGS.contains(&arg.as_str())
+            && !arg.contains("/")
+            && !arg.contains("\\")
         {
-            if DEBUG {
+            let (exists, is_dir) = (Path::new(arg).exists(), Path::new(arg).is_dir());
+
+            if constants::DEBUG {
                 println!(
                     "'{}': \nFile exists: {}\nDirectory Exists: {}",
-                    arg,
-                    path::Path::new(arg).exists(),
-                    path::Path::new(arg).is_dir()
+                    arg, exists, is_dir
                 );
             }
 
-            if !path::Path::new(arg).exists() && !path::Path::new(arg).is_dir() {
+            if !exists && !is_dir {
                 println!(
                     "srm: invalid option '{}'\nTry 'srm --help' for more information.",
                     arg
@@ -99,7 +73,7 @@ fn main() {
         }
     }
 
-    if DEBUG {
+    if constants::DEBUG {
         println!("\nPath: {}", path);
         println!("Recursive: {}", recursive);
         println!("Passes: {}", passes);
@@ -118,7 +92,7 @@ fn main() {
         // loop through the files
         for entry in entries {
             let object = entry.unwrap();
-            if DEBUG {
+            if constants::DEBUG {
                 println!("- DEBUG - File: {}", &object.file_name().to_string_lossy());
             }
             // if object is a directory
@@ -147,9 +121,9 @@ fn main() {
                 );
             }
         }
-    } else if path::Path::new(&path).is_dir() {
+    } else if Path::new(&path).is_dir() {
         if recursive {
-            if DEBUG {
+            if constants::DEBUG {
                 println!("- DEBUG - Path is a directory, calling delete_folder");
             }
             // if path is a directory and recursive is true, delete the folder
@@ -166,13 +140,13 @@ fn main() {
             // if path is a directory and recursive is false, skip the folder
             println!("srm: cannot remove '{}': Is a directory", path);
         }
-    } else if path::Path::new(&path).is_file() {
-            shred_file(&path, passes, verbose)
-        } else {
-            println!("srm: cannot remove '{}': No such file or directory", path);
-        }
+    } else if Path::new(&path).is_file() {
+        shred_file(&path, passes, verbose)
+    } else {
+        println!("srm: cannot remove '{}': No such file or directory", path);
+    }
 
-    if DEBUG {
+    if constants::DEBUG {
         println!("- DEBUG - Done.");
     }
 }
@@ -183,7 +157,7 @@ fn delete_folder(path: &String, passes: u32, verbose: bool) {
         return;
     }
 
-    if DEBUG {
+    if constants::DEBUG {
         println!("- DEBUG - Deleting folder: '{}'", path);
     }
 
@@ -194,7 +168,7 @@ fn delete_folder(path: &String, passes: u32, verbose: bool) {
     for entry in entries {
         let object = entry.unwrap();
 
-        if DEBUG {
+        if constants::DEBUG {
             println!("- DEBUG - File: {}", &object.file_name().to_string_lossy());
         }
 
@@ -224,7 +198,7 @@ fn delete_folder(path: &String, passes: u32, verbose: bool) {
 }
 
 fn shred_file(path: &String, passes: u32, verbose: bool) {
-    if DEBUG {
+    if constants::DEBUG {
         println!("- DEBUG - Deleting file: '{}'", path);
     }
 
@@ -251,10 +225,10 @@ fn shred_file(path: &String, passes: u32, verbose: bool) {
 }
 
 fn version() {
-    println!("srm {}", VERSION);
-    println!("License {}", LICENSE);
+    println!("srm {}", constants::VERSION);
+    println!("License {}", constants::LICENSE);
     println!("This is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.");
-    println!("\nWritten by {}.", AUTHOR);
+    println!("\nWritten by {}.", constants::AUTHOR);
 }
 
 fn help() {

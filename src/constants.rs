@@ -1,4 +1,4 @@
-pub const DEBUG: bool = false;
+pub const DEBUG: bool = true;
 pub const VERSION: &'static str = "2.1.0";
 pub const AUTHOR: &'static str = "Olivier Thornton";
 pub const LICENSE: &'static str =
