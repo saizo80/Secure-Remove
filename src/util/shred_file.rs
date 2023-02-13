@@ -1,26 +1,60 @@
+use std::{
+    fs,
+    io::{Seek, Write},
+};
+
 use crate::config::constants;
+use rand::{RngCore, SeedableRng};
+use rand_chacha::ChaChaRng;
 
 pub fn shred_file(path: &String, passes: u32, verbose: bool) {
     if constants::DEBUG {
         println!("- DEBUG - Deleting file: '{}'", path);
     }
 
-    let files = vec![path.to_string()];
-
     if verbose {
         print!("Deleting file '{}' . . .\t\t", path);
     }
 
-    let config = file_shred::ShredConfig {
-        files,
-        confirmation_prompt: false,
-        verbosity: file_shred::Verbosity::Quiet,
-        keep_files: false,
-        overwrite_count: passes,
-        rename_count: passes,
-        progress_bar: false,
-    };
-    file_shred::shred(&config).unwrap();
+    // open the file for reading and overwriting
+    let mut file = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .append(false)
+        .open(path)
+        .unwrap();
+
+    // create a buffer to hold the data
+    let size = file.metadata().unwrap().len();
+    let mut buffer = vec![0; size.min(512) as usize];
+
+    // create a random number generator
+    let mut rng = ChaChaRng::from_entropy();
+
+    // loop through the passes
+    for _ in [0..passes] {
+        // seek to the beginning of the file
+        file.seek(std::io::SeekFrom::Start(0)).unwrap();
+
+        // overwrite the file with random data, 512 bytes at a time until the file is empty
+        let mut offset = 0;
+        while offset < size {
+            // fill the buffer with random data
+            rng.fill_bytes(&mut buffer);
+
+            // write the buffer to the file
+            file.write(&buffer).unwrap();
+
+            // increment the offset
+            offset += buffer.len() as u64;
+        }
+
+        // flush the file
+        file.flush().unwrap();
+    }
+
+    // delete the file
+    fs::remove_file(path).unwrap();
 
     if verbose {
         println!("Done");
