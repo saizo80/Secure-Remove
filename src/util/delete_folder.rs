@@ -29,7 +29,7 @@ pub fn delete_folder(path: &String, passes: u32, verbose: bool) {
             delete_folder(&new_path, passes, verbose);
 
             if verbose {
-                print!("Deleting directory '{}' . . .\t\t", path);
+                print!("Deleting directory '{}' . . .\t\t", new_path);
             }
 
             // delete the directory
