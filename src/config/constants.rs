@@ -1,10 +1,10 @@
-pub const DEBUG: bool = true;
-const VERSION: &str = "2.1.0";
+pub const DEBUG: bool = false;
+const VERSION: &str = "2.2.0";
 const AUTHOR: &str = "Olivier Thornton";
 const LICENSE: &str = "GPLV3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.";
 
 pub fn version() {
-    println!("srm {}", VERSION);
+    println!("srm v{}", VERSION);
     println!("License {}", LICENSE);
     println!("This is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.");
     println!("\nWritten by {}.", AUTHOR);
