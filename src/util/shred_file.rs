@@ -32,9 +32,10 @@ pub fn shred_file(path: &String, passes: u32, verbose: bool) {
     let mut rng = ChaChaRng::from_entropy();
 
     // loop through the passes
+    #[allow(clippy::single_element_loop)]
     for _ in [0..passes] {
         // seek to the beginning of the file
-        file.seek(std::io::SeekFrom::Start(0)).unwrap();
+        file.rewind().unwrap();
 
         // overwrite the file with random data, 512 bytes at a time until the file is empty
         let mut offset = 0;
@@ -43,7 +44,7 @@ pub fn shred_file(path: &String, passes: u32, verbose: bool) {
             rng.fill_bytes(&mut buffer);
 
             // write the buffer to the file
-            file.write(&buffer).unwrap();
+            file.write_all(&buffer).unwrap();
 
             // increment the offset
             offset += buffer.len() as u64;

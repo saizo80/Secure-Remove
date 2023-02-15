@@ -1,10 +1,11 @@
 [package]
 name = "secure_remove"
-version = "2.2.1"
+version = "2.2.2"
 edition = "2021"
 authors = ["Olivier Thornton <oli@simplemail.is>"]
 description = "Securely remove files and directories"
 readme = "README.md"
+homepage = "https://github.com/saizo80/Secure-Remove/"
 repository = "https://github.com/saizo80/Secure-Remove/"
 license = "GPL-3.0-or-later"
 keywords = ["secure", "remove", "delete", "shred", "file"]
