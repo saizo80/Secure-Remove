@@ -1,5 +1,5 @@
 pub const DEBUG: bool = false;
-const VERSION: &str = "2.2.0";
+const VERSION: &str = "2.2.1";
 const AUTHOR: &str = "Olivier Thornton";
 const LICENSE: &str = "GPLV3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.";
 
