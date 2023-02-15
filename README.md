@@ -44,6 +44,3 @@ So `srm ./*` would be okay, whereas `srm ./*.txt` would **not** be okay.
 
 Other functions you can see by running `srm --help`.
 
-## Credit
-
-This project uses [software](https://github.com/mverleg/file_shred) written by GitHub user [mverleg](https://github.com/mverleg).
