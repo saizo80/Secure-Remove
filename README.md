@@ -40,9 +40,11 @@ cargo install --path Secure-Remove
 
 The simplest scheme of using srm is `srm [Options] [Target(s)]`.
 
-The functions are very similar to what you can do with regular `rm`, except (for now) you cannot use wildcards inside of a path.
+The functions are very similar to what you can do with regular `rm`, except (for now) you cannot use wildcards inside of a path on Windows.
 
-So `srm ./*` would be okay, whereas `srm ./*.txt` would **not** be okay.
+So `srm ./*` would be okay, whereas `srm .\*.txt` would **not** be okay.
+
+However, because of the way that bash and zsh auto expand wildcards, on Linux and Mac `srm ./*.txt` is perfectly fine to use.
 
 Other functions you can see by running `srm --help`.
 

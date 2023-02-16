@@ -63,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "secure_remove"
-version = "2.2.2"
+version = "2.2.3"
 dependencies = [
  "rand",
  "rand_chacha",

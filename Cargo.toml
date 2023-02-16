@@ -1,6 +1,6 @@
 [package]
 name = "secure_remove"
-version = "2.2.2"
+version = "2.2.3"
 edition = "2021"
 authors = ["Olivier Thornton <oli@simplemail.is>"]
 description = "Securely remove files and directories"

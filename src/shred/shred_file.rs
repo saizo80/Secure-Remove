@@ -12,17 +12,23 @@ pub fn shred_file(path: &String, passes: u32, verbose: bool) {
         println!("- DEBUG - Deleting file: '{}'", path);
     }
 
-    if verbose {
-        print!("Deleting file '{}' . . .\t\t", path);
-    }
-
     // open the file for reading and overwriting
-    let mut file = fs::OpenOptions::new()
+    let mut file = match fs::OpenOptions::new()
         .read(true)
         .write(true)
         .append(false)
         .open(path)
-        .unwrap();
+    {
+        Ok(file) => file,
+        Err(_) => {
+            println!("'{}': Failed to open file", path);
+            return;
+        }
+    };
+
+    if verbose {
+        print!("Deleting file '{}' . . .\t\t", path);
+    }
 
     // create a buffer to hold the data
     let size = file.metadata().unwrap().len();
