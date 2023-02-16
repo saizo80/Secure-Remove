@@ -104,7 +104,8 @@ fn main() -> Result<(), std::io::Error> {
         if is_file {
             shred_file(&path, passes, verbose);
         } else if is_dir {
-            if recursive && !path.ends_with('.') && !path.ends_with("..") {
+            let dirname = path.split(|c| c == '/' || c == '\\').last().unwrap();
+            if recursive && ![".", ".."].contains(&dirname) {
                 match delete_folder(&path, passes, verbose) {
                     Ok(_) => {
                         if verbose {
